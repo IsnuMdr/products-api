@@ -40,19 +40,4 @@ export class CategoryController {
     const category = await this.categoryService.findOne(id);
     return ResponseUtil.success(category);
   }
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateCategoryDto: any,
-  ) {
-    const category = await this.categoryService.update(id, updateCategoryDto);
-    return ResponseUtil.success(category);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.OK)
-  async remove(@Param('id') id: string) {
-    await this.categoryService.remove(id);
-    return ResponseUtil.success();
-  }
 }
