@@ -23,14 +23,16 @@ Before you begin, ensure you have the following installed:
 
 ## 🔧 Installation
 
-### Step 1: Extract the Project
+### Step 1: Git Clone the Repository
 
-Extract the project folder to your desired location.
+```bash
+git clone https://github.com/IsnuMdr/products-api.git
+```
 
 ### Step 2: Install Dependencies
 
 ```bash
-cd product-api
+cd products-api
 npm install
 ```
 
