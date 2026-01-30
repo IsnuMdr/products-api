@@ -117,12 +117,12 @@ This will create:
 npm run start:dev
 ```
 
-The server will start at: **http://localhost:3000/api/v1**
+The server will start at: **http://localhost:3000/api**
 
 You should see:
 
 ```
-🚀 Application is running on: http://localhost:3000/api/v1
+🚀 Application is running on: http://localhost:3000/api
 ```
 
 ### Production Mode
@@ -176,7 +176,7 @@ All requests in the collection are pre-configured. Simply:
 ### Base URL
 
 ```
-http://localhost:3000/api/v1
+http://localhost:3000/api
 ```
 
 ### Authentication
@@ -270,7 +270,7 @@ GET /api/search?name=laptop&price.start=1000000&price.end=5000000&category.name=
 **Request:**
 
 ```http
-POST /api/v1/categories
+POST /api/categories
 Content-Type: application/json
 x-api-key: my-super-secret-api-key-12345
 
@@ -307,7 +307,7 @@ x-api-key: my-super-secret-api-key-12345
 **Request:**
 
 ```http
-POST /api/v1/products
+POST /api/products
 Content-Type: application/json
 x-api-key: my-super-secret-api-key-12345
 
