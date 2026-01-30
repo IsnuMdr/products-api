@@ -10,13 +10,13 @@ export class GlobalValidationPipe extends ValidationPipe {
         enableImplicitConversion: true,
       },
       exceptionFactory: (errors: ValidationError[]) => {
-        const formattedErrors = errors.map((error) => ({
-          field: error.property,
-          errors: Object.values(error.constraints || {}),
-        }));
-
+        const formattedErrors: Record<string, string[]> = {};
+        errors.forEach((error) => {
+          if (error.constraints) {
+            formattedErrors[error.property] = Object.values(error.constraints);
+          }
+        });
         return new BadRequestException({
-          message: 'Validation failed',
           errors: formattedErrors,
         });
       },

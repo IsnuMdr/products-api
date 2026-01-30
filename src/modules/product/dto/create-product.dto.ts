@@ -8,12 +8,12 @@ import {
   MaxLength,
   IsInt,
 } from 'class-validator';
+import { IsUnique } from 'src/common/decorators/is-unique.decorator';
 
 export class CreateProductDto {
   @IsNotEmpty({ message: 'SKU is required' })
   @IsString({ message: 'SKU must be a string' })
-  @MinLength(3, { message: 'SKU must be at least 3 characters' })
-  @MaxLength(50, { message: 'SKU must not exceed 50 characters' })
+  @IsUnique('product', 'sku', { message: 'SKU must be unique' })
   sku: string;
 
   @IsNotEmpty({ message: 'Name is required' })

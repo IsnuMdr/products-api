@@ -18,31 +18,37 @@ import { QueryProductDto } from './dto/query-product.dto';
 import { ApiKeyGuard } from '../../common/guards/api-key.guard';
 import { ResponseUtil } from '../../common/utils/response.util';
 
-@Controller('products')
+@Controller('/')
 @UseGuards(ApiKeyGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
-  @Post()
+  @Post('products')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createProductDto: CreateProductDto) {
     const product = await this.productService.create(createProductDto);
     return ResponseUtil.success(product);
   }
 
-  @Get()
+  @Get('products')
   async findAll(@Query() queryProductDto: QueryProductDto) {
     const { products, meta } = await this.productService.findAll(queryProductDto);
     return ResponseUtil.success(products, meta);
   }
 
-  @Get(':id')
+  @Get('search')
+  async search(@Query() queryProductDto: QueryProductDto) {
+    const { products, meta } = await this.productService.findAll(queryProductDto);
+    return ResponseUtil.success(products, meta);
+  }
+
+  @Get('products/:id')
   async findOne(@Param('id') id: string) {
     const product = await this.productService.findOne(id);
     return ResponseUtil.success(product);
   }
 
-  @Patch(':id')
+  @Patch('products/:id')
   async update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -51,14 +57,14 @@ export class ProductController {
     return ResponseUtil.success(product);
   }
 
-  @Delete(':id')
+  @Delete('products/:id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string) {
     await this.productService.remove(id);
     return ResponseUtil.success();
   }
 
-  @Patch(':id/stock')
+  @Patch('products/:id/stock')
   async updateStock(
     @Param('id') id: string,
     @Body('quantity') quantity: number,
