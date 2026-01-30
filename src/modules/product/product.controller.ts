@@ -27,19 +27,19 @@ export class ProductController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createProductDto: CreateProductDto) {
     const product = await this.productService.create(createProductDto);
-    return ResponseUtil.success('Product created successfully', product);
+    return ResponseUtil.success(product);
   }
 
   @Get()
   async findAll(@Query() queryProductDto: QueryProductDto) {
     const { products, meta } = await this.productService.findAll(queryProductDto);
-    return ResponseUtil.success('Products retrieved successfully', products, meta);
+    return ResponseUtil.success(products, meta);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const product = await this.productService.findOne(id);
-    return ResponseUtil.success('Product retrieved successfully', product);
+    return ResponseUtil.success(product);
   }
 
   @Patch(':id')
@@ -48,14 +48,14 @@ export class ProductController {
     @Body() updateProductDto: UpdateProductDto,
   ) {
     const product = await this.productService.update(id, updateProductDto);
-    return ResponseUtil.success('Product updated successfully', product);
+    return ResponseUtil.success(product);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string) {
     await this.productService.remove(id);
-    return ResponseUtil.success('Product deleted successfully');
+    return ResponseUtil.success();
   }
 
   @Patch(':id/stock')
@@ -64,6 +64,6 @@ export class ProductController {
     @Body('quantity') quantity: number,
   ) {
     const product = await this.productService.updateStock(id, quantity);
-    return ResponseUtil.success('Product stock updated successfully', product);
+    return ResponseUtil.success(product);
   }
 }

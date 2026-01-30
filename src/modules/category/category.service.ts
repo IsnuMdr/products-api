@@ -36,10 +36,9 @@ export class CategoryService {
     ]);
 
     const meta: PaginationMeta = {
-      page,
-      limit,
+      current: page,
+      size: limit,
       total,
-      totalPages: Math.ceil(total / limit),
     };
 
     return { categories, meta };

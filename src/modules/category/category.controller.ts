@@ -27,19 +27,19 @@ export class CategoryController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     const category = await this.categoryService.create(createCategoryDto);
-    return ResponseUtil.success('Category created successfully', category);
+    return ResponseUtil.success(category);
   }
 
   @Get()
   async findAll(@Query() paginationDto: PaginationDto) {
     const { categories, meta } = await this.categoryService.findAll(paginationDto);
-    return ResponseUtil.success('Categories retrieved successfully', categories, meta);
+    return ResponseUtil.success(categories, meta);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const category = await this.categoryService.findOne(id);
-    return ResponseUtil.success('Category retrieved successfully', category);
+    return ResponseUtil.success(category);
   }
 
   @Patch(':id')
@@ -48,13 +48,13 @@ export class CategoryController {
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
     const category = await this.categoryService.update(id, updateCategoryDto);
-    return ResponseUtil.success('Category updated successfully', category);
+    return ResponseUtil.success(category);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string) {
     await this.categoryService.remove(id);
-    return ResponseUtil.success('Category deleted successfully');
+    return ResponseUtil.success();
   }
 }

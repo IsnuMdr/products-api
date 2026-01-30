@@ -59,10 +59,9 @@ export class ProductService {
     ]);
 
     const meta: PaginationMeta = {
-      page,
-      limit,
+      current: page,
+      size: limit,
       total,
-      totalPages: Math.ceil(total / limit),
     };
 
     return { products, meta };

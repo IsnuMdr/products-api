@@ -1,14 +1,11 @@
 export interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
   data?: T;
   errors?: any;
-  meta?: PaginationMeta;
+  paging?: PaginationMeta;
 }
 
 export interface PaginationMeta {
-  page: number;
-  limit: number;
+  current: number;
+  size: number;
   total: number;
-  totalPages: number;
 }

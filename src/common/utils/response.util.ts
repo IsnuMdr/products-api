@@ -5,22 +5,17 @@ import {
 
 export class ResponseUtil {
   static success<T>(
-    message: string,
     data?: T,
     meta?: PaginationMeta,
   ): ApiResponse<T> {
     return {
-      success: true,
-      message,
       data,
-      meta,
+      paging: meta,
     };
   }
 
-  static error(message: string, errors?: any): ApiResponse {
+  static error(errors?: any): ApiResponse {
     return {
-      success: false,
-      message,
       errors,
     };
   }
