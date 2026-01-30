@@ -63,10 +63,9 @@ describe('ProductController', () => {
     });
 
     it('should throw validation error if required fields are missing', async () => {
-      // Simulate validation error thrown by service
       (service.create as jest.Mock).mockRejectedValueOnce({
         status: 400,
-        message: 'Validation failed: sku is required',
+        errors: { sku: 'sku is empty' },
       });
       const dto: CreateProductDto = {
         name: 'Test', price: 100, stock: 10, categoryId: 'cat1',
@@ -74,21 +73,35 @@ describe('ProductController', () => {
       }; // missing sku
       await expect(controller.create(dto)).rejects.toMatchObject({
         status: 400,
-        message: expect.stringContaining('sku is required'),
+        errors: expect.objectContaining({ sku: expect.stringContaining('is empty') }),
       });
     });
 
     it('should throw error if category does not exist', async () => {
       (service.create as jest.Mock).mockRejectedValueOnce({
         status: 400,
-        message: 'Category with ID catX does not exist',
+        errors: 'Category with ID catX does not exist',
       });
       const dto: CreateProductDto = {
         name: 'Test', sku: 'SKU1', price: 100, stock: 10, categoryId: 'catX',
       };
       await expect(controller.create(dto)).rejects.toMatchObject({
         status: 400,
-        message: expect.stringContaining('Category with ID catX does not exist'),
+        errors: expect.stringContaining('Category with ID catX does not exist'),
+      });
+    });
+
+    it('should return authorization error when API key is invalid', async () => {
+      (service.create as jest.Mock).mockRejectedValueOnce({
+        status: 401,
+        errors: 'Invalid API key',
+      });
+      const dto: CreateProductDto = {
+        name: 'Test', sku: 'SKU1', price: 100, stock: 10, categoryId: 'cat1',
+      };
+      await expect(controller.create(dto)).rejects.toMatchObject({
+        status: 401,
+        errors: expect.stringContaining('Invalid API key'),
       });
     });
   });
@@ -100,6 +113,15 @@ describe('ProductController', () => {
       expect(service.findAll).toHaveBeenCalledWith(query);
       expect(ResponseUtil.success).toHaveBeenCalledWith(productListMock, metaMock);
       expect(result).toEqual({ data: productListMock, meta: metaMock, success: true });
+    });
+
+    it('should return empty data if no products found', async () => {
+      (service.findAll as jest.Mock).mockResolvedValueOnce({ products: [], meta: { current: 1, size: 10, total: 0 } });
+      const query = {};
+      const result = await controller.findAll(query);
+      expect(service.findAll).toHaveBeenCalledWith(query);
+      expect(ResponseUtil.success).toHaveBeenCalledWith([], { current: 1, size: 10, total: 0 });
+      expect(result).toEqual({ data: [], meta: { current: 1, size: 10, total: 0 }, success: true });
     });
   });
 
@@ -150,6 +172,15 @@ describe('ProductController', () => {
       expect(service.findAll).toHaveBeenCalledWith(query);
       expect(ResponseUtil.success).toHaveBeenCalledWith(productListMock, metaMock);
       expect(result).toEqual({ data: productListMock, meta: metaMock, success: true });
+    });
+
+    it('should return empty data if no products found', async () => {
+      (service.findAll as jest.Mock).mockResolvedValueOnce({ products: [], meta: { current: 1, size: 10, total: 0 } });
+      const query = { sku: ['nonexistent'] };
+      const result = await controller.search(query);
+      expect(service.findAll).toHaveBeenCalledWith(query);
+      expect(ResponseUtil.success).toHaveBeenCalledWith([], { current: 1, size: 10, total: 0 });
+      expect(result).toEqual({ data: [], meta: { current: 1, size: 10, total: 0 }, success: true });
     });
   });
 });
