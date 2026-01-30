@@ -41,35 +41,4 @@ export class ProductController {
     const { products, meta } = await this.productService.findAll(queryProductDto);
     return ResponseUtil.success(products, meta);
   }
-
-  @Get('products/:id')
-  async findOne(@Param('id') id: string) {
-    const product = await this.productService.findOne(id);
-    return ResponseUtil.success(product);
-  }
-
-  @Patch('products/:id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateProductDto: UpdateProductDto,
-  ) {
-    const product = await this.productService.update(id, updateProductDto);
-    return ResponseUtil.success(product);
-  }
-
-  @Delete('products/:id')
-  @HttpCode(HttpStatus.OK)
-  async remove(@Param('id') id: string) {
-    await this.productService.remove(id);
-    return ResponseUtil.success();
-  }
-
-  @Patch('products/:id/stock')
-  async updateStock(
-    @Param('id') id: string,
-    @Body('quantity') quantity: number,
-  ) {
-    const product = await this.productService.updateStock(id, quantity);
-    return ResponseUtil.success(product);
-  }
 }

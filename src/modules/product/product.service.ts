@@ -103,7 +103,6 @@ export class ProductService {
     return { products, meta };
   }
 
-
   async findOne(id: string) {
     const product = await this.productRepository.findOne(id);
 
@@ -112,44 +111,5 @@ export class ProductService {
     }
 
     return product;
-  }
-
-  async update(id: string, updateProductDto: UpdateProductDto) {
-    await this.findOne(id);
-
-    // Verify category exists if categoryId is being updated
-    if (updateProductDto.categoryId) {
-      await this.categoryService.findOne(updateProductDto.categoryId);
-    }
-
-    // Check if new SKU conflicts with existing product
-    if (updateProductDto.sku) {
-      const existingProduct = await this.productRepository.findBySku(
-        updateProductDto.sku,
-      );
-
-      if (existingProduct && existingProduct.id !== id) {
-        throw new ConflictException('Product with this SKU already exists');
-      }
-    }
-
-    return this.productRepository.update(id, updateProductDto);
-  }
-
-  async remove(id: string) {
-    await this.findOne(id);
-    return this.productRepository.remove(id);
-  }
-
-  async updateStock(id: string, quantity: number) {
-    const product = await this.findOne(id);
-
-    const newStock = product.stock + quantity;
-
-    if (newStock < 0) {
-      throw new BadRequestException('Insufficient stock');
-    }
-
-    return this.productRepository.update(id, { stock: newStock });
   }
 }

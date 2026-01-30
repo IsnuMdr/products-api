@@ -3,17 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   UseGuards,
   Query,
   HttpCode,
   HttpStatus,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiKeyGuard } from '../../common/guards/api-key.guard';
 import { ResponseUtil } from '../../common/utils/response.util';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -41,11 +40,10 @@ export class CategoryController {
     const category = await this.categoryService.findOne(id);
     return ResponseUtil.success(category);
   }
-
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
+    @Body() updateCategoryDto: any,
   ) {
     const category = await this.categoryService.update(id, updateCategoryDto);
     return ResponseUtil.success(category);

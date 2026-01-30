@@ -53,26 +53,4 @@ export class CategoryService {
 
     return category;
   }
-
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    await this.findOne(id);
-
-    // Check if new name conflicts with existing category
-    if (updateCategoryDto.name) {
-      const existingCategory = await this.categoryRepository.findByName(
-        updateCategoryDto.name,
-      );
-
-      if (existingCategory && existingCategory.id !== id) {
-        throw new ConflictException('Category with this name already exists');
-      }
-    }
-
-    return this.categoryRepository.update(id, updateCategoryDto);
-  }
-
-  async remove(id: string) {
-    await this.findOne(id);
-    return this.categoryRepository.remove(id);
-  }
 }
