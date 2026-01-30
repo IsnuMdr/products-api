@@ -4,12 +4,12 @@ import { PaginationDto } from '../../../common/dto/pagination.dto';
 
 export class QueryProductDto extends PaginationDto {
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @Transform(({ value }) => value === undefined || value === null ? undefined : (Array.isArray(value) ? value : [value]))
   @IsString({ each: true })
   sku?: string[];
 
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @Transform(({ value }) => value === undefined || value === null ? undefined : (Array.isArray(value) ? value : [value]))
   @IsString({ each: true })
   name?: string[];
 
@@ -38,12 +38,12 @@ export class QueryProductDto extends PaginationDto {
   'stock.end'?: number;
 
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @Transform(({ value }) => value === undefined || value === null ? undefined : (Array.isArray(value) ? value : [value]))
   @IsString({ each: true })
   'category.id'?: string[];
 
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @Transform(({ value }) => value === undefined || value === null ? undefined : (Array.isArray(value) ? value : [value]))
   @IsString({ each: true })
   'category.name'?: string[];
 }

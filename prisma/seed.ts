@@ -6,11 +6,16 @@ async function main() {
   console.log('🌱 Starting seed...');
 
   // Seed Categories
+  const now = new Date();
+  const nowMilis = now.getTime();
+
   const electronics = await prisma.category.upsert({
     where: { name: 'Electronics' },
     update: {},
     create: {
       name: 'Electronics',
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 
@@ -19,6 +24,8 @@ async function main() {
     update: {},
     create: {
       name: 'Clothing',
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 
@@ -27,6 +34,8 @@ async function main() {
     update: {},
     create: {
       name: 'Books',
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 
@@ -42,6 +51,8 @@ async function main() {
       price: 25000000,
       stock: 10,
       categoryId: electronics.id,
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 
@@ -54,6 +65,8 @@ async function main() {
       price: 20000000,
       stock: 15,
       categoryId: electronics.id,
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 
@@ -66,6 +79,8 @@ async function main() {
       price: 350000,
       stock: 50,
       categoryId: clothing.id,
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 
@@ -78,6 +93,8 @@ async function main() {
       price: 450000,
       stock: 25,
       categoryId: books.id,
+      createdAt: new Date(nowMilis),
+      updatedAt: new Date(nowMilis),
     },
   });
 

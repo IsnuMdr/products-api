@@ -8,17 +8,31 @@ export class CategoryRepository {
   constructor(private prisma: PrismaService) { }
 
   async create(createCategoryDto: CreateCategoryDto) {
+    const { createdAt, updatedAt, ...rest } = createCategoryDto as any;
     return this.prisma.category.create({
-      data: createCategoryDto,
-    });
+      data: {
+        ...rest,
+        createdAt: createdAt ? new Date(createdAt) : undefined,
+        updatedAt: updatedAt ? new Date(updatedAt) : undefined,
+      },
+    }).then(category => ({
+      ...category,
+      createdAt: category.createdAt.getTime(),
+      updatedAt: category.updatedAt.getTime(),
+    }));
   }
 
   async findAll(skip: number, take: number) {
-    return this.prisma.category.findMany({
+    const categories = await this.prisma.category.findMany({
       skip,
       take,
       orderBy: { createdAt: 'desc' },
     });
+    return categories.map(category => ({
+      ...category,
+      createdAt: category.createdAt.getTime(),
+      updatedAt: category.updatedAt.getTime(),
+    }));
   }
 
   async count() {
@@ -26,12 +40,23 @@ export class CategoryRepository {
   }
 
   async findOne(id: string) {
-    return this.prisma.category.findUnique({
+    const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
         products: true,
       },
     });
+    if (!category) return null;
+    return {
+      ...category,
+      createdAt: category.createdAt.getTime(),
+      updatedAt: category.updatedAt.getTime(),
+      products: category.products ? category.products.map(product => ({
+        ...product,
+        createdAt: product.createdAt.getTime(),
+        updatedAt: product.updatedAt.getTime(),
+      })) : undefined,
+    };
   }
 
   async findByName(name: string) {
@@ -41,10 +66,20 @@ export class CategoryRepository {
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    return this.prisma.category.update({
+    const { createdAt, updatedAt, ...rest } = updateCategoryDto as any;
+    const category = await this.prisma.category.update({
       where: { id },
-      data: updateCategoryDto,
+      data: {
+        ...rest,
+        createdAt: createdAt ? new Date(createdAt) : undefined,
+        updatedAt: updatedAt ? new Date(updatedAt) : undefined,
+      },
     });
+    return {
+      ...category,
+      createdAt: category.createdAt.getTime(),
+      updatedAt: category.updatedAt.getTime(),
+    };
   }
 
   async remove(id: string) {
