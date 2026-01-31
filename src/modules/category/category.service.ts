@@ -5,17 +5,23 @@ import {
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoryRepository } from './repositories/category.repository';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { PaginationMeta } from '../../common/interfaces/api-response.interface';
+import { CategoryCommandRepository } from './repositories/category-command.repository';
+import { CategoryQueryRepository } from './repositories/category-query.repository';
+import { RedisService } from 'src/config/redis.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) { }
+  constructor(
+    private readonly commandRepository: CategoryCommandRepository,
+    private readonly queryRepository: CategoryQueryRepository,
+    private readonly redisService: RedisService,
+  ) { }
 
   async create(createCategoryDto: CreateCategoryDto) {
     // Check if category with same name exists
-    const existingCategory = await this.categoryRepository.findByName(
+    const existingCategory = await this.queryRepository.findByName(
       createCategoryDto.name,
     );
 
@@ -23,7 +29,11 @@ export class CategoryService {
       throw new ConflictException('Category with this name already exists');
     }
 
-    return this.categoryRepository.create(createCategoryDto);
+    const category = await this.commandRepository.create(createCategoryDto);
+
+    await this.redisService.publish('category.created', category);
+
+    return category;
   }
 
   async findAll(paginationDto: PaginationDto) {
@@ -31,8 +41,8 @@ export class CategoryService {
     const skip = (page - 1) * limit;
 
     const [categories, total] = await Promise.all([
-      this.categoryRepository.findAll(skip, limit),
-      this.categoryRepository.count(),
+      this.queryRepository.findAll(skip, limit),
+      this.queryRepository.count(),
     ]);
 
     const meta: PaginationMeta = {
@@ -45,7 +55,7 @@ export class CategoryService {
   }
 
   async findOne(id: string) {
-    const category = await this.categoryRepository.findOne(id);
+    const category = await this.queryRepository.findOne(id);
 
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);

@@ -1,7 +1,9 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryService } from './category.service';
-import { CategoryRepository } from './repositories/category.repository';
+import { CategoryCommandRepository } from './repositories/category-command.repository';
+import { CategoryQueryRepository } from './repositories/category-query.repository';
+import { RedisService } from 'src/config/redis.service';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 const categoryMock = {
@@ -12,12 +14,17 @@ const categoryMock = {
 const categoryListMock = [categoryMock];
 const metaMock = { current: 1, size: 10, total: 1 };
 
-const categoryRepositoryMock = {
+const commandRepositoryMock = {
   create: jest.fn().mockResolvedValue(categoryMock),
+};
+const queryRepositoryMock = {
   findAll: jest.fn().mockResolvedValue(categoryListMock),
   count: jest.fn().mockResolvedValue(1),
   findOne: jest.fn().mockResolvedValue(categoryMock),
   findByName: jest.fn().mockResolvedValue(null),
+};
+const redisServiceMock = {
+  publish: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('CategoryService', () => {
@@ -28,7 +35,9 @@ describe('CategoryService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CategoryService,
-        { provide: CategoryRepository, useValue: categoryRepositoryMock },
+        { provide: CategoryCommandRepository, useValue: commandRepositoryMock },
+        { provide: CategoryQueryRepository, useValue: queryRepositoryMock },
+        { provide: RedisService, useValue: redisServiceMock },
       ],
     }).compile();
     service = module.get<CategoryService>(CategoryService);
@@ -40,13 +49,15 @@ describe('CategoryService', () => {
 
   describe('create', () => {
     it('should create category', async () => {
-      categoryRepositoryMock.findByName.mockResolvedValueOnce(null);
+      queryRepositoryMock.findByName.mockResolvedValueOnce(null);
       const dto = { name: 'Category 1' };
       await expect(service.create(dto)).resolves.toEqual(categoryMock);
-      expect(categoryRepositoryMock.create).toHaveBeenCalledWith(dto);
+      expect(queryRepositoryMock.findByName).toHaveBeenCalledWith(dto.name);
+      expect(commandRepositoryMock.create).toHaveBeenCalledWith(dto);
+      expect(redisServiceMock.publish).toHaveBeenCalledWith('category.created', categoryMock);
     });
     it('should throw ConflictException if name exists', async () => {
-      categoryRepositoryMock.findByName.mockResolvedValueOnce(categoryMock);
+      queryRepositoryMock.findByName.mockResolvedValueOnce(categoryMock);
       const dto = { name: 'Category 1' };
       await expect(service.create(dto)).rejects.toThrow(ConflictException);
     });
@@ -55,20 +66,24 @@ describe('CategoryService', () => {
   describe('findAll', () => {
     it('should return categories and meta', async () => {
       const query = { page: 1, limit: 10 };
+      queryRepositoryMock.findAll.mockResolvedValueOnce(categoryListMock);
+      queryRepositoryMock.count.mockResolvedValueOnce(1);
       const result = await service.findAll(query);
       expect(result.categories).toEqual(categoryListMock);
-      expect(result.meta).toEqual(metaMock);
+      expect(result.meta).toEqual({ current: 1, size: 10, total: 1 });
+      expect(queryRepositoryMock.findAll).toHaveBeenCalled();
+      expect(queryRepositoryMock.count).toHaveBeenCalled();
     });
   });
 
   describe('findOne', () => {
     it('should return a category', async () => {
-      categoryRepositoryMock.findOne.mockResolvedValueOnce(categoryMock);
+      queryRepositoryMock.findOne.mockResolvedValueOnce(categoryMock);
       await expect(service.findOne('1')).resolves.toEqual(categoryMock);
-      expect(categoryRepositoryMock.findOne).toHaveBeenCalledWith('1');
+      expect(queryRepositoryMock.findOne).toHaveBeenCalledWith('1');
     });
     it('should throw NotFoundException if not found', async () => {
-      categoryRepositoryMock.findOne.mockResolvedValueOnce(null);
+      queryRepositoryMock.findOne.mockResolvedValueOnce(null);
       await expect(service.findOne('2')).rejects.toThrow(NotFoundException);
     });
   });
