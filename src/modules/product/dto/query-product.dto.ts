@@ -46,4 +46,16 @@ export class QueryProductDto extends PaginationDto {
   @Transform(({ value }) => value === undefined || value === null ? undefined : (Array.isArray(value) ? value : [value]))
   @IsString({ each: true })
   'category.name'?: string[];
+
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  page?: number = 1;
+
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  limit?: number = 10;
 }

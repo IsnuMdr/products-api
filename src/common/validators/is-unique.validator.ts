@@ -4,12 +4,12 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/config/prisma.service';
+import { CommandPrismaService } from 'src/config/command-prisma.service';
 
 @ValidatorConstraint({ name: 'Unique', async: true })
 @Injectable()
 export class UniqueValidator implements ValidatorConstraintInterface {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: CommandPrismaService) { }
 
   async validate(value: any, args: ValidationArguments) {
     const [model, field] = args.constraints;

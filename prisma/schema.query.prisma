@@ -1,14 +1,12 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator commandClient {
+// Query Database Client (Read Operations)
+generator queryClient {
   provider = "prisma-client-js"
-  output   = "../node_modules/@prisma/command-client"
+  output   = "../node_modules/@prisma/query-client"
 }
 
-datasource commandDb {
+datasource queryDb {
   provider = "postgresql"
-  url      = env("COMMAND_DATABASE_URL")
+  url      = env("QUERY_DATABASE_URL")
 }
 
 model Category {
@@ -25,7 +23,7 @@ model Product {
   id         String   @id @default(uuid())
   sku        String   @unique
   name       String
-  price      Decimal  @commandDb.Decimal(10, 2)
+  price      Decimal  @queryDb.Decimal(10, 2)
   stock      Int      @default(0)
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)

@@ -1,10 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient as CommandPrismaClient } from '@prisma/command-client';
+import { PrismaClient as QueryPrismaClient } from '@prisma/query-client';
 
-const prisma = new PrismaClient();
+const commandPrisma = new CommandPrismaClient();
+const queryPrisma = new QueryPrismaClient();
 
-async function main() {
-  console.log('🌱 Starting seed...');
 
+async function seedClient(prisma) {
   // Seed Categories
   const now = new Date();
   const nowMilis = now.getTime();
@@ -39,7 +40,6 @@ async function main() {
     },
   });
 
-  console.log('✅ Categories seeded');
 
   // Seed Products
   await prisma.product.upsert({
@@ -97,8 +97,16 @@ async function main() {
       updatedAt: new Date(nowMilis),
     },
   });
+}
 
-  console.log('✅ Products seeded');
+async function main() {
+  console.log('🌱 Starting seed for Command DB...');
+  await seedClient(commandPrisma);
+  console.log('✅ Command DB seeded');
+
+  console.log('🌱 Starting seed for Query DB...');
+  await seedClient(queryPrisma);
+  console.log('✅ Query DB seeded');
   console.log('🎉 Seed completed successfully!');
 }
 
@@ -108,5 +116,6 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await commandPrisma.$disconnect();
+    await queryPrisma.$disconnect();
   });
