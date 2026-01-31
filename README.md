@@ -12,6 +12,7 @@ A RESTful API for managing products and categories built with NestJS, Prisma, an
 | TypeScript        | 5.7.3   | Programming language |
 | class-validator   | 0.14.1  | Input validation     |
 | class-transformer | 0.5.1   | Data transformation  |
+| ioredis           | 5.3.2   | Redis client         |
 
 ## 📋 Prerequisites
 
@@ -19,7 +20,8 @@ Before you begin, ensure you have the following installed:
 
 - **Node.js** (v18.x or higher)
 - **npm** or **yarn**
-- **PostgreSQL database** (Neon account recommended)
+- **Two PostgreSQL databases** (Neon accounts recommended for Command and Query DBs)
+- **Redis** (local installation or cloud service like Cloud Redis)
 
 ## 🔧 Installation
 
@@ -72,8 +74,14 @@ PORT=3000
 # API Key (Change this to a secure key for production)
 API_KEY=my-super-secret-api-key-12345
 
-# Database Configuration (Replace with your Neon connection string)
-DATABASE_URL=postgresql://username:password@ep-xxx-xxx.region.aws.neon.tech/dbname?sslmode=require
+# Command Database (Write Operations - Neon)
+COMMAND_DATABASE_URL=postgresql://user:pass@ep-xxx.region.aws.neon.tech/command_db?sslmode=require
+
+# Query Database (Read Operations - Neon)
+QUERY_DATABASE_URL=postgresql://user:pass@ep-yyy.region.aws.neon.tech/query_db?sslmode=require
+
+# Redis Configuration
+REDIS_URL="redis://default:your_redis_password@your_redis_host:your_redis_port"
 ```
 
 **Important Security Notes:**
@@ -82,21 +90,27 @@ DATABASE_URL=postgresql://username:password@ep-xxx-xxx.region.aws.neon.tech/dbna
 - ⚠️ **DATABASE_URL**: Keep this secret and never commit to version control
 - ⚠️ The `.env` file is already in `.gitignore`
 
-### Step 3: Setup Database
+### Step 3: Setup Databases
 
-Generate Prisma Client:
-
-```bash
-npm run prisma:generate
-```
-
-Run database migrations to create tables:
+Generate Prisma clients for both databases:
 
 ```bash
-npm run prisma:migrate
+# Generate Command DB client
+npx prisma generate --schema=./prisma/schema.prisma
+
+# Generate Query DB client
+npx prisma generate --schema=./prisma/schema.query.prisma
 ```
 
-When prompted for a migration name, you can use: `init`
+Run migrations on BOTH databases:
+
+```bash
+# Migrate Command DB
+npx prisma migrate dev --schema=./prisma/schema.prisma --name init
+
+# Migrate Query DB
+npx prisma migrate dev --schema=./prisma/schema.query.prisma --name init
+```
 
 ### Step 4: Seed Database (Optional)
 
