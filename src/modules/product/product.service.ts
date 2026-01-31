@@ -28,15 +28,6 @@ export class ProductService {
     // Verify category exists
     await this.categoryService.findOne(createProductDto.categoryId);
 
-    // Check if product with same SKU exists in Command DB
-    const existingProduct = await this.commandRepository.findBySku(
-      createProductDto.sku,
-    );
-
-    if (existingProduct) {
-      throw new ConflictException('Product with this SKU already exists');
-    }
-
     // Create in Command DB
     const product = await this.commandRepository.create(createProductDto);
 
@@ -163,20 +154,8 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    // Verify category exists if categoryId is being updated
     if (updateProductDto.categoryId) {
       await this.categoryService.findOne(updateProductDto.categoryId);
-    }
-
-    // Check if new SKU conflicts with existing product
-    if (updateProductDto.sku) {
-      const skuProduct = await this.commandRepository.findBySku(
-        updateProductDto.sku,
-      );
-
-      if (skuProduct && skuProduct.id !== id) {
-        throw new ConflictException('Product with this SKU already exists');
-      }
     }
 
     // Update in Command DB
