@@ -1,6 +1,6 @@
-# NestJS Product API
+# NestJS Product API (Implementing CQRS with Separate Command and Query Databases)
 
-A RESTful API for managing products and categories built with NestJS, Prisma, and PostgreSQL (Neon).
+A RESTful API for managing products and categories built with NestJS, Prisma, and PostgreSQL. Use two separate databases to implement the CQRS pattern: one for command operations (writes) and another for query operations (reads). Redis is used for caching frequently accessed data.
 
 ## 🛠️ Tech Stack
 
